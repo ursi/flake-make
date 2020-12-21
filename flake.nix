@@ -8,12 +8,13 @@
     flake-utils.lib.eachDefaultSystem
       (system:
         let pkgs = nixpkgs.legacyPackages.${system}; in
+          with pkgs;
           {
             defaultPackage =
-                (import ./psnp.nix { inherit pkgs; })
-                  .overrideAttrs (old: { buildInputs = [ pkgs.git ] ++ old.buildInputs; });
+                (import ./psnp.nix { inherit lib pkgs; })
+                  .overrideAttrs (old: { buildInputs = [ git ] ++ old.buildInputs; });
 
-            devShell = with pkgs;
+            devShell =
               mkShell {
                 buildInputs = [
                   dhall

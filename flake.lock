@@ -2,11 +2,11 @@
   "nodes": {
     "dhall-to-nix": {
       "locked": {
-        "lastModified": 1608522766,
-        "narHash": "sha256-cFtBOcAc1PWX6I72s3cEUA9ruVlTaUbvzYK+NSxr4SY=",
+        "lastModified": 1608524608,
+        "narHash": "sha256-QFmam3Ni39j88IYaS5eJvMIOm0b3YQ+bTn1rCtXLsyc=",
         "owner": "ursi",
         "repo": "dhall-to-nix",
-        "rev": "82a409a404e6b29067d4ef98b580d79d7c41980f",
+        "rev": "dc546c3941947cc4e48b64fa12bbf97bde240c86",
         "type": "github"
       },
       "original": {
@@ -94,11 +94,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1608523820,
-        "narHash": "sha256-Dl3CaOF2T8D7PjMIm3t7M453zf1zHwkw/IwpMecHYXQ=",
+        "lastModified": 1608547103,
+        "narHash": "sha256-Qw+dLVkiVzMgYEpGXNWKO/4iGp5YU2Iyk3Q0ePlGXbU=",
         "owner": "ursi",
         "repo": "psnp",
-        "rev": "1c0dd0ee3ba18f7529148d315394a6fd54a38776",
+        "rev": "00a963f09c9aa7e2c9cd03c82328e4154f3bc9e5",
         "type": "github"
       },
       "original": {
