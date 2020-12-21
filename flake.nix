@@ -9,9 +9,9 @@
       (system:
         let pkgs = nixpkgs.legacyPackages.${system}; in
           {
-            # defaultPackage =
-            #     (import ./psnp.nix { inherit pkgs; })
-            #       .overrideAttrs (old: { buildInputs = [ git ] ++ old.buildInputs; });
+            defaultPackage =
+                (import ./psnp.nix { inherit pkgs; })
+                  .overrideAttrs (old: { buildInputs = [ pkgs.git ] ++ old.buildInputs; });
 
             devShell = with pkgs;
               mkShell {

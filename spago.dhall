@@ -8,4 +8,5 @@
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs" ]
+, version = "0.1.0"
 }
