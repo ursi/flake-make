@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "dhall-to-nix": {
+      "locked": {
+        "lastModified": 1608522766,
+        "narHash": "sha256-cFtBOcAc1PWX6I72s3cEUA9ruVlTaUbvzYK+NSxr4SY=",
+        "owner": "ursi",
+        "repo": "dhall-to-nix",
+        "rev": "82a409a404e6b29067d4ef98b580d79d7c41980f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ursi",
+        "repo": "dhall-to-nix",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "locked": {
         "lastModified": 1605370193,
@@ -74,15 +89,16 @@
     },
     "psnp": {
       "inputs": {
+        "dhall-to-nix": "dhall-to-nix",
         "nixpkgs": "nixpkgs_2",
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1608165536,
-        "narHash": "sha256-uV0sDf0gte63Samp+t2TOHx9VcFzcZIqbyOri6egl4I=",
+        "lastModified": 1608523820,
+        "narHash": "sha256-Dl3CaOF2T8D7PjMIm3t7M453zf1zHwkw/IwpMecHYXQ=",
         "owner": "ursi",
         "repo": "psnp",
-        "rev": "53dd2d55b3e0d2f7abf576527897dec974260ad2",
+        "rev": "1c0dd0ee3ba18f7529148d315394a6fd54a38776",
         "type": "github"
       },
       "original": {
