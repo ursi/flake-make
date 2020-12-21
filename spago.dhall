@@ -1,4 +1,4 @@
-{ name = "make-flake"
+{ name = "flake-make"
 , dependencies =
   [ "mason-prelude"
   , "node-process"
@@ -8,5 +8,5 @@
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs" ]
-, psnp = { version = "0.1.0" }
+, psnp = { version = "0.1.0", command = "make-flake" }
 }
