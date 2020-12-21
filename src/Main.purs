@@ -66,8 +66,7 @@ main = do
                       );
                     """
                 }
-            "node" -> makeSimpleShell "nodejs"
-            _ -> "no template exists for \"" <> arg <> "\""
+            package -> makeSimpleShell package
           void $ CP.exec "git add flake.nix" CP.defaultExecOptions
 
 quote :: String -> String
