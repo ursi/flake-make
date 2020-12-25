@@ -36,34 +36,30 @@ main = do
                 { inputs:
                     Just
                       """
-                      inputs = {
-                        flake-utils.url = "github:numtide/flake-utils";
-                        psnp.url = "github:ursi/psnp";
-                      };
+                      inputs.psnp.url = "github:ursi/psnp";
                       """
-                , args: [ "flake-utils", "psnp" ]
+                , args: [ "utils", "psnp" ]
                 , body:
                     """
-                    flake-utils.lib.eachDefaultSystem
-                      (system:
-                        let pkgs = nixpkgs.legacyPackages.${system}; in
-                          {
-                            # defaultPackage =
-                            #     (import ./psnp.nix { inherit pkgs; })
-                            #       .overrideAttrs (old: { buildInputs = [] ++ old.buildInputs; });
+                    utils.defaultSystems
+                      ({ pkgs, system }: with pkgs;
+                        {
+                          # defaultPackage =
+                          #     (import ./psnp.nix { inherit lib pkgs; })
+                          #       .overrideAttrs (old: { buildInputs = [] ++ old.buildInputs; });
 
-                            devShell = with pkgs;
-                              mkShell {
-                                buildInputs = [
-                                  dhall
-                                  nodejs
-                                  psnp.defaultPackage.${system}
-                                  purescript
-                                  spago
-                                ];
-                              };
-                          }
-                      );
+                          devShell = mkShell {
+                            buildInputs = [
+                              dhall
+                              nodejs
+                              psnp.defaultPackage.${system}
+                              purescript
+                              spago
+                            ];
+                          };
+                        }
+                      )
+                      nixpkgs;
                     """
                 }
             package -> makeSimpleShell package
