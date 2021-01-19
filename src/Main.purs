@@ -62,6 +62,23 @@ main = do
                       nixpkgs;
                     """
                 }
+            "shell" ->
+              basicFrame
+                { inputs: Nothing
+                , args: [ "utils" ]
+                , body:
+                    """
+                    utils.mkShell
+                      ({ pkgs, ... }: with pkgs;
+                        {
+                          buildInputs = [];
+
+                          shellHook = '''';
+                        }
+                      )
+                      nixpkgs;
+                    """
+                }
             package -> makeSimpleShell package
           void $ CP.exec "git add flake.nix" CP.defaultExecOptions
 
