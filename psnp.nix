@@ -130,8 +130,8 @@
 
       globals = builtins.fetchGit {
         url = "https://github.com/purescript/purescript-globals.git";
-        rev = "8e6d69c36b6fd8c988a3664fc033ad11dbdd5860";
-        ref = "refs/tags/v4.1.0";
+        rev = "8887124c2cdb0aa45556c4ce6cdfbfc9a41fc282";
+        ref = "refs/tags/v5.0.0";
       };
 
       identity = builtins.fetchGit {
@@ -280,8 +280,8 @@
 
       point-free = builtins.fetchGit {
         url = "https://github.com/ursi/purescript-point-free.git";
-        rev = "55d146b104881e3696b150ca48b4b33a82e99b9d";
-        ref = "refs/tags/v0.1.1";
+        rev = "4ebf719da1733f6252c469c7fcff8053d2933b7c";
+        ref = "refs/tags/v0.1.3";
       };
 
       posix-types = builtins.fetchGit {
@@ -298,8 +298,8 @@
 
       proxy = builtins.fetchGit {
         url = "https://github.com/purescript/purescript-proxy.git";
-        rev = "4a529b1f874fa2f32fc4c575cafaf46e0ab69fb6";
-        ref = "refs/tags/v3.0.0";
+        rev = "a236f932fd01f202a854308166a066831d62cf7b";
+        ref = "refs/tags/v3.0.2";
       };
 
       refs = builtins.fetchGit {
@@ -310,8 +310,8 @@
 
       return = builtins.fetchGit {
         url = "https://github.com/ursi/purescript-return.git";
-        rev = "5cd957172f7aeecbbc4eba771c019b680f1ec715";
-        ref = "refs/heads/master";
+        rev = "7cc6dba046d92896c519d08a785503173262d407";
+        ref = "refs/tags/v0.1.0";
       };
 
       st = builtins.fetchGit {
@@ -328,8 +328,8 @@
 
       substitute = builtins.fetchGit {
         url = "https://github.com/ursi/purescript-substitute.git";
-        rev = "e8782dd831a8575eccd9450c61d92872e9410e3f";
-        ref = "refs/heads/master";
+        rev = "8ec2d1854d63d36510871966d904841b0a994a3c";
+        ref = "refs/tags/v0.1.1";
       };
 
       tailrec = builtins.fetchGit {
