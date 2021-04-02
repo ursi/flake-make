@@ -43,21 +43,21 @@ main = do
                     """
                     utils.defaultSystems
                       ({ pkgs, system }: with pkgs;
-                        {
-                          # defaultPackage =
-                          #     (import ./psnp.nix pkgs)
-                          #       .overrideAttrs (old: { buildInputs = [] ++ old.buildInputs; });
+                         { # defaultPackage =
+                           #   (import ./psnp.nix { inherit lib pkgs; })
+                           #     .overrideAttrs (old: { buildInputs = [] ++ old.buildInputs; });
 
-                          devShell = mkShell {
-                            buildInputs = [
-                              dhall
-                              nodejs
-                              psnp.defaultPackage.${system}
-                              purescript
-                              spago
-                            ];
-                          };
-                        }
+                           devShell =
+                             mkShell
+                               { buildInputs =
+                                   [ dhall
+                                     nodejs
+                                     psnp.defaultPackage.${system}
+                                     purescript
+                                     spago
+                                   ];
+                               };
+                         }
                       )
                       nixpkgs;
                     """
@@ -70,11 +70,10 @@ main = do
                     """
                     utils.mkShell
                       ({ pkgs, ... }: with pkgs;
-                        {
-                          buildInputs = [];
+                         { buildInputs = [];
 
-                          shellHook = '''';
-                        }
+                           shellHook = '''';
+                         }
                       )
                       nixpkgs;
                     """
@@ -96,15 +95,14 @@ basicFrame { inputs, args, body } =
     Just i ->
       substitute
         """
-        {
-          @{inputs}
+        { @{inputs}
 
         """
         { inputs: i }
-    Nothing -> "{\n"
-    <> ( substitute
+    Nothing ->
+      ( substitute
           """
-            outputs = { self, nixpkgs@{args} }:
+          { outputs = { nixpkgs@{args}, ... }:
               @{body}
           }
           """
@@ -122,8 +120,7 @@ makeSimpleShell buildInputs =
         substitute
           """
           utils.simpleShell
-            [
-              @{buildInputs}
+            [ @{buildInputs}
             ]
             nixpkgs;
           """
