@@ -45,7 +45,7 @@ main = do
                       ({ pkgs, system }: with pkgs;
                         {
                           # defaultPackage =
-                          #     (import ./psnp.nix { inherit lib pkgs; })
+                          #     (import ./psnp.nix pkgs)
                           #       .overrideAttrs (old: { buildInputs = [] ++ old.buildInputs; });
 
                           devShell = mkShell {

@@ -6,7 +6,7 @@
       ({ pkgs, system }: with pkgs;
         {
           defaultPackage =
-              (import ./psnp.nix { inherit lib pkgs; })
+              (import ./psnp.nix pkgs)
                 .overrideAttrs (old: { buildInputs = [ git ] ++ old.buildInputs; });
 
           devShell = mkShell {
