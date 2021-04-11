@@ -1,20 +1,47 @@
-{ inputs.psnp.url = "github:ursi/psnp";
+{ inputs =
+    { nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+      purs-nix.url = "path:../purs-nix";#"github:ursi/purs-nix";
+      utils.url = "github:ursi/flake-utils";
+    };
 
-  outputs = { nixpkgs, utils, psnp, ... }:
+  outputs = { nixpkgs, utils, purs-nix, ... }:
     utils.defaultSystems
-      ({ pkgs, system }: with pkgs;
+      ({ pkgs, system }:
+         let
+           inherit (purs-nix { inherit system; }) purs ps-pkgs ps-pkgs-ns;
+           inherit
+             (purs
+                { dependencies =
+                    with ps-pkgs-ns;
+                    with ps-pkgs;
+                    [ node-process
+                      substitute
+                      ursi.prelude
+                      ursi.task-file
+                      ursi.task-node-child-process
+                    ];
+
+                  src = ./src;
+                }
+             )
+             modules
+             shell;
+         in
          { defaultPackage =
-             (import ./psnp.nix pkgs)
-               .overrideAttrs (old: { buildInputs = [ git ] ++ old.buildInputs; });
+             (modules.Main.install
+                { name = "flake-make";
+                  command = "make-flake";
+                }
+             )
+             .overrideAttrs (old: { buildInputs = [ pkgs.git ] ++ old.buildInputs; });
 
            devShell =
+             with pkgs;
              mkShell
                { buildInputs =
-                   [ dhall
-                     nodejs
-                     psnp.defaultPackage.${system}
+                   [ nodejs
                      purescript
-                     spago
+                     (shell {})
                    ];
                };
          }

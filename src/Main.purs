@@ -5,13 +5,13 @@ import Data.Array ((!!))
 import Data.String (Pattern(..))
 import Data.String as String
 import Node.Process (argv)
-import Substitute (class Homogeneous, defaultOptions, normalize, createSubstituter)
+import Substitute (class Homogeneous, defaultOptions, normalize, makeSubstituter)
 import Task as Task
 import Task.File as File
 import Task.ChildProcess as CP
 
 substitute :: ∀ r. Homogeneous r String => String -> Record r -> String
-substitute = createSubstituter $ defaultOptions { marker = '@' }
+substitute = makeSubstituter $ defaultOptions { marker = '@' }
 
 main :: Effect Unit
 main = do
