@@ -1,14 +1,15 @@
 { inputs =
     { nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
       purs-nix.url = "github:ursi/purs-nix";
-      utils.url = "github:ursi/flake-utils";
+      utils.url = "github:ursi/flake-utils/1";
     };
 
-  outputs = { nixpkgs, utils, purs-nix, ... }:
-    utils.defaultSystems
-      ({ pkgs, system }:
+  outputs = { nixpkgs, utils, ... }@inputs:
+    utils.default-systems
+      ({ make-shell, pkgs, purs-nix, ...}:
          let
-           inherit (purs-nix { inherit system; }) purs ps-pkgs ps-pkgs-ns;
+           inherit (purs-nix) purs ps-pkgs ps-pkgs-ns;
+
            inherit
              (purs
                 { dependencies =
@@ -25,7 +26,7 @@
                 }
              )
              modules
-             shell;
+             command;
          in
          { defaultPackage =
              (modules.Main.install
@@ -41,10 +42,10 @@
                { buildInputs =
                    [ nodejs
                      purescript
-                     (shell {})
+                     (command {})
                    ];
                };
          }
       )
-      nixpkgs;
+      { inherit inputs nixpkgs; };
 }
