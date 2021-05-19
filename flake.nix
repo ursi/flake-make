@@ -13,8 +13,8 @@
            inherit
              (purs
                 { dependencies =
-                    with ps-pkgs-ns;
                     with ps-pkgs;
+                    let inherit (ps-pkgs-ns) ursi; in
                     [ node-process
                       substitute
                       ursi.prelude
