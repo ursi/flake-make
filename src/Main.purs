@@ -2,15 +2,14 @@ module Main where
 
 import MasonPrelude
 import Data.Array ((!!))
-import Data.String (Pattern(..))
-import Data.String as String
+import Data.Array as Array
 import Node.Process (argv)
-import Substitute (class Homogeneous, defaultOptions, normalize, makeSubstituter)
+import Substitute (class Homogeneous, defaultOptions, makeSubstituter)
 import Task as Task
 import Task.File as File
 
 substitute :: ∀ r. Homogeneous r String => String -> Record r -> String
-substitute = makeSubstituter $ defaultOptions { marker = '@' }
+substitute = makeSubstituter $ defaultOptions { marker = '%' }
 
 main :: Effect Unit
 main = do
@@ -19,119 +18,146 @@ main = do
     >>= maybe (log "You need to supply one argument.") \arg ->
         Task.run do
           File.write "flake.nix" case arg of
-            "purescript" ->
-              makeSimpleShell
-                """
-                dhall
-                nodejs
-                nodePackages.pulp
-                nodePackages.bower
-                purescript
-                spago
-                """
-            "psnp" ->
-              basicFrame
-                { inputs:
-                    Just
-                      """
-                      inputs.psnp.url = "github:ursi/psnp";
-                      """
-                , args: [ "utils", "psnp" ]
-                , body:
-                    """
-                    utils.defaultSystems
-                      ({ pkgs, system }: with pkgs;
-                         { # defaultPackage =
-                           #   (import ./psnp.nix { inherit lib pkgs; })
-                           #     .overrideAttrs (old: { buildInputs = [] ++ old.buildInputs; });
-
-                           devShell =
-                             mkShell
-                               { buildInputs =
-                                   [ dhall
-                                     nodejs
-                                     psnp.defaultPackage.${system}
-                                     purescript
-                                     spago
-                                   ];
-                               };
-                         }
-                      )
-                      nixpkgs;
-                    """
+            "elm" ->
+              mkDefaultSystems
+                { outerInputs: []
+                , innerInputs:
+                    [ GhUrl "elm-install" "ursi/elm-install"
+                    , GhUrl "node-packages" "ursi/nix-node-packages"
+                    ]
+                , pkgs:
+                    [ "elm-install"
+                    , "elmPackages.elm"
+                    , "elmPackages.elm-format"
+                    , "elmPackages.elm-language-server"
+                    , "node-packages.elm-git-install"
+                    ]
                 }
+
             "shell" ->
-              basicFrame
-                { inputs: Nothing
-                , args: [ "utils" ]
-                , body:
-                    """
-                    utils.mkShell
-                      ({ pkgs, ... }: with pkgs;
-                         { buildInputs = [];
-
-                           shellHook = '''';
-                         }
-                      )
-                      nixpkgs;
-                    """
+              mkDefaultSystems
+                { outerInputs: []
+                , innerInputs: []
+                , pkgs: []
                 }
-            package -> makeSimpleShell package
 
-quote :: String -> String
-quote s = "\"" <> s <> "\""
+            package ->
+              mkDefaultSystems
+                { outerInputs: []
+                , innerInputs: []
+                , pkgs: [ package ]
+                }
+
+makeInputs :: Array Input -> String
+makeInputs inputs =
+  substitute
+    """
+    inputs =
+      { %{inputs}
+      };
+    """
+    { inputs:
+        inputs
+        # Array.sortWith inputName
+        <#> inputToString
+        # intercalate "\n"
+    }
+
+data Input
+  = Url String String
+  | GhUrl String String
+  | Set String (Array (String /\ String))
+
+inputName :: Input -> String
+inputName = case _ of
+  Url name _ -> name
+  GhUrl name _ -> name
+  Set name _ -> name
+
+inputToString :: Input -> String
+inputToString = case _ of
+  Url name url -> substitute """%{name}.url = "%{url}";""" { name, url }
+  GhUrl name url -> substitute """%{name}.url = "github:%{url}";""" { name, url }
+  Set name attributes ->
+    substitute
+      """
+
+      %{name} =
+        { %{attributes}
+        };
+      """
+      { name
+      , attributes:
+        attributes
+        # Array.sortWith fst
+        <#> (\(attrName /\ value) -> attrName <> " = " <> value <> ";")
+        # intercalate "\n"
+      }
+
+defaultInputs :: Array Input
+defaultInputs =
+    [ GhUrl "nixpkgs" "NixOS/nixpkgs/nixpkgs-unstable"
+    , GhUrl "utils" "ursi/flake-utils/1"
+    ]
 
 basicFrame ::
-  { inputs :: Maybe String
+  { inputs :: Array Input
   , args :: Array String
   , body :: String
+  , inputsName :: Maybe String
   } ->
   String
-basicFrame { inputs, args, body } =
-  case inputs of
-    Just i ->
+basicFrame { inputs, args, inputsName, body } =
       substitute
         """
-        { @{inputs}
+        { %{inputs}
 
+          outputs = { %{args}... }%{inputsName}:
+            %{body}
+        }
         """
-        { inputs: i }
-    Nothing ->
-      ( substitute
-          """
-          { outputs = { nixpkgs@{args}, ... }:
-              @{body}
-          }
-          """
-          { args: foldMap (\arg -> ", " <> arg) args
-          , body
-          }
-      )
+        { inputs: makeInputs inputs
+        , args: foldMap (\arg -> arg <> ", ") args
+        , inputsName:
+            inputsName
+            # maybe "" \str -> "@" <> str
+        , body
+        }
 
-makeSimpleShell :: String -> String
-makeSimpleShell buildInputs =
+mkDefaultSystems ::
+  { outerInputs :: Array Input
+  , innerInputs :: Array Input
+  , pkgs :: Array String
+  }
+  -> String
+mkDefaultSystems { outerInputs, innerInputs, pkgs } =
   basicFrame
-    { inputs: Nothing
-    , args: [ "utils" ]
+    { inputs: defaultInputs <> outerInputs <> innerInputs
+    , args:
+        (defaultInputs <> outerInputs)
+        <#> inputName
+        # Array.sort
+    , inputsName: Just "inputs"
     , body:
         substitute
           """
-          utils.simpleShell
-            [ @{buildInputs}
-            ]
-            nixpkgs;
-          """
-          { buildInputs: mapLines quote $ normalize buildInputs }
-    }
-
-mapLines :: (String -> String) -> String -> String
-mapLines f =
-  String.split (Pattern "\n")
-    .> foldMap
-        ( \line ->
-            ( if line == "" then
-                ""
-              else
-                f line <> "\n"
+          utils.default-systems
+            ({ %{args}... }:
+               { devShell =
+                   make-shell
+                     { packages =
+                         with pkgs;
+                         [ %{pkgs}
+                         ];
+                     };
+               }
             )
-        )
+            { inherit nixpkgs inputs; };
+          """
+          { args:
+              [ "make-shell", "pkgs" ] <> (inputName <$> innerInputs)
+              # Array.sort
+              # foldMap (_ <> ", ")
+          , pkgs: pkgs # Array.sort # intercalate "\n"
+          }
+    }
