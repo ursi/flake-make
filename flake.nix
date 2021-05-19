@@ -37,11 +37,12 @@
              .overrideAttrs (old: { buildInputs = [ pkgs.git ] ++ old.buildInputs; });
 
            devShell =
-             with pkgs;
-             mkShell
-               { buildInputs =
+             make-shell
+               { packages =
+                   with pkgs;
                    [ nodejs
-                     purescript
+                     nodePackages.purescript-language-server
+                     purs-nix.purescript
                      (command {})
                    ];
                };
