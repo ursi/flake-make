@@ -19,7 +19,6 @@
                       substitute
                       ursi.prelude
                       ursi.task-file
-                      ursi.task-node-child-process
                     ];
 
                   src = ./src;
@@ -29,12 +28,10 @@
              command;
          in
          { defaultPackage =
-             (modules.Main.install
+             modules.Main.install
                 { name = "flake-make";
                   command = "make-flake";
-                }
-             )
-             .overrideAttrs (old: { buildInputs = [ pkgs.git ] ++ old.buildInputs; });
+                };
 
            devShell =
              make-shell

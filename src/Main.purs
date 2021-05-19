@@ -8,7 +8,6 @@ import Node.Process (argv)
 import Substitute (class Homogeneous, defaultOptions, normalize, makeSubstituter)
 import Task as Task
 import Task.File as File
-import Task.ChildProcess as CP
 
 substitute :: ∀ r. Homogeneous r String => String -> Record r -> String
 substitute = makeSubstituter $ defaultOptions { marker = '@' }
@@ -19,7 +18,6 @@ main = do
     <#> (_ !! 2)
     >>= maybe (log "You need to supply one argument.") \arg ->
         Task.run do
-          _ <- CP.exec "git init" CP.defaultExecOptions
           File.write "flake.nix" case arg of
             "purescript" ->
               makeSimpleShell
@@ -79,7 +77,6 @@ main = do
                     """
                 }
             package -> makeSimpleShell package
-          void $ CP.exec "git add flake.nix" CP.defaultExecOptions
 
 quote :: String -> String
 quote s = "\"" <> s <> "\""
