@@ -97,7 +97,7 @@ inputToString = case _ of
 defaultInputs :: Array Input
 defaultInputs =
     [ GhUrl "nixpkgs" "NixOS/nixpkgs/nixpkgs-unstable"
-    , GhUrl "utils" "ursi/flake-utils/1"
+    , GhUrl "utils" "ursi/flake-utils/2"
     ]
 
 basicFrame ::
@@ -152,7 +152,7 @@ mkDefaultSystems { outerInputs, innerInputs, pkgs } =
                      };
                }
             )
-            { inherit nixpkgs inputs; };
+            inputs;
           """
           { args:
               [ "make-shell", "pkgs" ] <> (inputName <$> innerInputs)
