@@ -1,7 +1,7 @@
 module Main where
 
 import MasonPrelude
-import Data.Array ((!!))
+import Data.Array ((:), (!!))
 import Data.Array as Array
 import Node.Process (argv)
 import Substitute (class Homogeneous, defaultOptions, makeSubstituter)
@@ -94,11 +94,11 @@ inputToString = case _ of
         # intercalate "\n"
       }
 
-defaultInputs :: Array Input
-defaultInputs =
-    [ GhUrl "nixpkgs" "NixOS/nixpkgs/nixpkgs-unstable"
-    , GhUrl "utils" "ursi/flake-utils/2"
-    ]
+nixpkgs :: Input
+nixpkgs = GhUrl "nixpkgs" "NixOS/nixpkgs/nixpkgs-unstable"
+
+utils :: Input
+utils = GhUrl "utils" "ursi/flake-utils/2"
 
 basicFrame ::
   { inputs :: Array Input
@@ -132,9 +132,9 @@ mkDefaultSystems ::
   -> String
 mkDefaultSystems { outerInputs, innerInputs, pkgs } =
   basicFrame
-    { inputs: defaultInputs <> outerInputs <> innerInputs
+    { inputs: [ nixpkgs, utils ] <> outerInputs <> innerInputs
     , args:
-        (defaultInputs <> outerInputs)
+        (utils : outerInputs)
         <#> inputName
         # Array.sort
     , inputsName: Just "inputs"
