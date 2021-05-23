@@ -41,6 +41,17 @@ main = do
                 , pkgs: []
                 }
 
+            "spago" ->
+               mkDefaultSystems
+                 { outerInputs: []
+                 , innerInputs: [ GhUrl "easy-ps" "ursi/easy-purescript-nix/flake" ]
+                 , pkgs:
+                     [ "easy-ps.spago"
+                     , "easy-ps.purescript"
+                     , "nodejs"
+                     , "nodePackages.purescript-language-server"
+                     ]
+                 }
             package ->
               mkDefaultSystems
                 { outerInputs: []
