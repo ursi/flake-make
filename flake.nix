@@ -21,7 +21,7 @@
                       ursi.task-file
                     ];
 
-                  src = ./src;
+                  srcs = [ ./src ];
                 }
              )
              modules
