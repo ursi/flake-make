@@ -109,7 +109,7 @@ nixpkgs :: Input
 nixpkgs = GhUrl "nixpkgs" "NixOS/nixpkgs/nixpkgs-unstable"
 
 utils :: Input
-utils = GhUrl "utils" "ursi/flake-utils/2"
+utils = GhUrl "utils" "ursi/flake-utils/4"
 
 basicFrame ::
   { inputs :: Array Input
