@@ -105,11 +105,15 @@ inputToString = case _ of
         # intercalate "\n"
       }
 
+makeShell :: Input
+makeShell = GhUrl "make-shell" "ursi/nix-make-shell"
+
 nixpkgs :: Input
 nixpkgs = GhUrl "nixpkgs" "NixOS/nixpkgs/nixpkgs-unstable"
 
 utils :: Input
-utils = GhUrl "utils" "ursi/flake-utils/4"
+utils = GhUrl "utils" "ursi/flake-utils/6"
+
 
 basicFrame ::
   { inputs :: Array Input
@@ -143,7 +147,7 @@ mkDefaultSystems ::
   -> String
 mkDefaultSystems { outerInputs, innerInputs, pkgs } =
   basicFrame
-    { inputs: [ nixpkgs, utils ] <> outerInputs <> innerInputs
+    { inputs: [ makeShell, nixpkgs, utils ] <> outerInputs <> innerInputs
     , args:
         (utils : outerInputs)
         <#> inputName
@@ -152,7 +156,7 @@ mkDefaultSystems { outerInputs, innerInputs, pkgs } =
     , body:
         substitute
           """
-          utils.default-systems
+          utils.for-default-systems
             ({ %{args}... }:
                { devShell =
                    make-shell
