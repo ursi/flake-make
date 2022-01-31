@@ -106,7 +106,7 @@ inputToString = case _ of
       }
 
 makeShell :: Input
-makeShell = GhUrl "make-shell" "ursi/nix-make-shell"
+makeShell = GhUrl "make-shell" "ursi/nix-make-shell/1"
 
 nixpkgs :: Input
 nixpkgs = GhUrl "nixpkgs" "NixOS/nixpkgs/nixpkgs-unstable"
