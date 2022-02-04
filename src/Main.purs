@@ -112,8 +112,7 @@ nixpkgs :: Input
 nixpkgs = GhUrl "nixpkgs" "NixOS/nixpkgs/nixpkgs-unstable"
 
 utils :: Input
-utils = GhUrl "utils" "ursi/flake-utils/6"
-
+utils = GhUrl "utils" "ursi/flake-utils/7"
 
 basicFrame ::
   { inputs :: Array Input
@@ -156,7 +155,7 @@ mkDefaultSystems { outerInputs, innerInputs, pkgs } =
     , body:
         substitute
           """
-          utils.for-default-systems
+          utils.make-flake { inherit inputs; }
             ({ %{args}... }:
                { devShell =
                    make-shell
@@ -166,8 +165,7 @@ mkDefaultSystems { outerInputs, innerInputs, pkgs } =
                          ];
                      };
                }
-            )
-            inputs;
+            );
           """
           { args:
               [ "make-shell", "pkgs" ] <> (inputName <$> innerInputs)
