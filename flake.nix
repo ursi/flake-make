@@ -29,7 +29,7 @@
              command;
          in
          { defaultPackage =
-             modules.Main.install
+             modules.Main.app
                 { name = "flake-make";
                   command = "make-flake";
                 };
