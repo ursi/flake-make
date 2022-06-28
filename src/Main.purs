@@ -13,51 +13,54 @@ substitute = makeSubstituter $ defaultOptions { marker = '%' }
 
 main :: Effect Unit
 main = do
-  argv
-    <#> (_ !! 2)
-    >>= maybe (log "You need to supply one argument.") \arg ->
-        Task.run do
-          File.write "flake.nix" case arg of
-            "elm" ->
+  marg <- argv <#> (_ !! 2)
+  (Task.run <. File.write "flake.nix")
+    (marg
+     # maybe
+       emptyFlake
+       \arg ->
+         case arg of
+           "elm" ->
+             mkDefaultSystems
+               { outerInputs: []
+               , innerInputs:
+                   [ GhUrl "elm-install" "ursi/elm-install"
+                   , GhUrl "node-packages" "ursi/nix-node-packages"
+                   ]
+               , pkgs:
+                   [ "elm-install"
+                   , "elmPackages.elm"
+                   , "elmPackages.elm-format"
+                   , "elmPackages.elm-language-server"
+                   , "node-packages.elm-git-install"
+                   ]
+               }
+
+           "shell" ->
+             mkDefaultSystems
+               { outerInputs: []
+               , innerInputs: []
+               , pkgs: []
+               }
+
+           "spago" ->
               mkDefaultSystems
                 { outerInputs: []
-                , innerInputs:
-                    [ GhUrl "elm-install" "ursi/elm-install"
-                    , GhUrl "node-packages" "ursi/nix-node-packages"
-                    ]
+                , innerInputs: [ GhUrl "easy-ps" "ursi/easy-purescript-nix/flake" ]
                 , pkgs:
-                    [ "elm-install"
-                    , "elmPackages.elm"
-                    , "elmPackages.elm-format"
-                    , "elmPackages.elm-language-server"
-                    , "node-packages.elm-git-install"
+                    [ "easy-ps.spago"
+                    , "easy-ps.purescript"
+                    , "nodejs"
+                    , "nodePackages.purescript-language-server"
                     ]
                 }
-
-            "shell" ->
-              mkDefaultSystems
-                { outerInputs: []
-                , innerInputs: []
-                , pkgs: []
-                }
-
-            "spago" ->
-               mkDefaultSystems
-                 { outerInputs: []
-                 , innerInputs: [ GhUrl "easy-ps" "ursi/easy-purescript-nix/flake" ]
-                 , pkgs:
-                     [ "easy-ps.spago"
-                     , "easy-ps.purescript"
-                     , "nodejs"
-                     , "nodePackages.purescript-language-server"
-                     ]
-                 }
-            package ->
-              mkDefaultSystems
-                { outerInputs: []
-                , innerInputs: []
-                , pkgs: [ package ]
-                }
+           package ->
+             mkDefaultSystems
+               { outerInputs: []
+               , innerInputs: []
+               , pkgs: [ package ]
+               }
+    )
 
 makeInputs :: Array Input -> String
 makeInputs inputs =
@@ -127,6 +130,7 @@ basicFrame { inputs, args, inputsName, body } =
         { %{inputs}
 
           outputs = { %{args}... }%{inputsName}:
+            with builtins;
             %{body}
         }
         """
@@ -157,6 +161,7 @@ mkDefaultSystems { outerInputs, innerInputs, pkgs } =
           """
           utils.apply-systems { inherit inputs; }
             ({ %{args}... }:
+               let l = p.lib; p = pkgs; in
                { devShell =
                    make-shell
                      { packages =
@@ -173,4 +178,21 @@ mkDefaultSystems { outerInputs, innerInputs, pkgs } =
               # foldMap (_ <> ", ")
           , pkgs: pkgs # Array.sort # intercalate "\n"
           }
+    }
+
+emptyFlake :: String
+emptyFlake =
+  basicFrame
+    { inputs: [ nixpkgs, utils ]
+    , args: [ inputName utils ]
+    , inputsName: Just "inputs"
+    , body:
+        """
+        utils.apply-systems { inherit inputs; }
+          ({ pkgs, ... }:
+             let l = p.lib; p = pkgs; in
+             {
+             }
+          );
+        """
     }
