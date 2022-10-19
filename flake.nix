@@ -28,13 +28,13 @@
              modules
              command;
          in
-         { defaultPackage =
+         { packages.default =
              modules.Main.app
                 { name = "flake-make";
                   command = "make-flake";
                 };
 
-           devShell =
+           devShells.default =
              make-shell
                { packages =
                    with pkgs;
